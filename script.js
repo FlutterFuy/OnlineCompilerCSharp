@@ -64,6 +64,11 @@ class Program
         output.textContent = languageSwitcher.value === 'ru' ? 'Компиляция...' : 'Compiling...';
 
         try {
+            // Проверка наличия сети
+            if (!navigator.onLine) {
+                throw new Error(languageSwitcher.value === 'ru' ? 'Нет подключения к интернету.' : 'No internet connection.');
+            }
+
             const response = await fetch('https://dotnetfiddle.net/api/compiler', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
@@ -75,6 +80,10 @@ class Program
                 }),
             });
 
+            if (!response.ok) {
+                throw new Error(languageSwitcher.value === 'ru' ? 'Ошибка сервера.' : 'Server error.');
+            }
+
             const result = await response.json();
 
             if (result.Errors) {
@@ -83,7 +92,7 @@ class Program
                 output.textContent = result.Output;
             }
         } catch (error) {
-            output.textContent = languageSwitcher.value === 'ru' ? 'Ошибка при компиляции: Failed to fetch' : 'Compilation error: Failed to fetch';
+            output.textContent = languageSwitcher.value === 'ru' ? `Ошибка: ${error.message}` : `Error: ${error.message}`;
         }
     });
 });
