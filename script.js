@@ -1,9 +1,6 @@
 document.addEventListener("DOMContentLoaded", () => {
     const themeToggle = document.getElementById("theme-toggle");
     const body = document.body;
-    const languageSwitcher = document.getElementById("language-switcher");
-    const title = document.getElementById("title");
-    const outputTitle = document.getElementById("output-title");
     const compileButton = document.getElementById("compile");
     const output = document.getElementById("output");
 
@@ -38,35 +35,22 @@ class Program
         themeToggle.textContent = isDark ? "🌙" : "☀️";
     });
 
-    // Переключение языка
-    languageSwitcher.addEventListener("change", () => {
-        const lang = languageSwitcher.value;
-        if (lang === "ru") {
-            title.textContent = "Онлайн компилятор C#";
-            compileButton.textContent = "Скомпилировать";
-            outputTitle.textContent = "Результат:";
-        } else {
-            title.textContent = "Online C# Compiler";
-            compileButton.textContent = "Compile";
-            outputTitle.textContent = "Output:";
-        }
-    });
-
-    // Компиляция кода с использованием glot.io
+    // Компиляция кода
     compileButton.addEventListener("click", async () => {
         const code = editor.getValue();
 
         if (!code.trim()) {
-            output.textContent = languageSwitcher.value === "ru"
-                ? "Пожалуйста, введите код для компиляции."
-                : "Please enter code to compile.";
+            output.textContent = "Введите код для компиляции.";
             return;
         }
 
-        output.textContent = languageSwitcher.value === "ru" ? "Компиляция..." : "Compiling...";
+        output.textContent = "Компиляция...";
 
         try {
-            const response = await fetch("https://glot.io/api/run/csharp/latest", {
+            const proxyUrl = "https://cors-anywhere.herokuapp.com/";
+            const apiUrl = "https://glot.io/api/run/csharp/latest";
+
+            const response = await fetch(proxyUrl + apiUrl, {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
@@ -78,16 +62,13 @@ class Program
             });
 
             if (!response.ok) {
-                throw new Error(languageSwitcher.value === "ru" ? "Ошибка сервера." : "Server error.");
+                throw new Error("Ошибка сервера.");
             }
 
             const result = await response.json();
-
             output.textContent = result.stderr ? `Ошибка: ${result.stderr}` : result.stdout;
         } catch (error) {
-            output.textContent = languageSwitcher.value === "ru"
-                ? `Ошибка: ${error.message}`
-                : `Error: ${error.message}`;
+            output.textContent = `Ошибка: ${error.message}`;
         }
     });
 });
