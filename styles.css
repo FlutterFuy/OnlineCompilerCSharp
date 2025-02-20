@@ -98,6 +98,10 @@ pre {
     margin: 0;
 }
 
+textarea, input, select, button {
+    font-size: 16px; /* Фиксированный размер шрифта */
+}
+
 /* Адаптивность */
 @media (max-width: 768px) {
     .editor {
